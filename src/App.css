@@ -1,0 +1,156 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: rgb(18,19,19);
+  min-height: 100vh;
+  width: 100%;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  padding-top: 40px;
+}
+
+.phantom-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+}
+
+.phantom-content {
+  text-align: center;
+  padding: 30px 25px;
+  max-width: 260px;
+  width: 260px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.phantom-logo {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.phantom-image {
+  width: 70px;
+  height: 70px;
+  border-radius: 16px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.3));
+  transition: transform 0.3s ease;
+}
+
+.phantom-image:hover {
+  transform: scale(1.05);
+}
+
+.phantom-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.phantom-subtitle {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: #e5e7eb;
+}
+
+.phantom-description {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-bottom: 28px;
+  line-height: 1.4;
+}
+
+.status-container {
+  width: 100%;
+  text-align: center;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-message {
+  font-size: 14px;
+  color: #d1d5db;
+  margin: 10px 0;
+  line-height: 1.4;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #60a5fa;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+  margin-top: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Interactive 3D effect */
+.phantom-content:hover {
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+}
+
+@media (max-width: 480px) {
+  .phantom-content {
+    padding: 40px 20px;
+  }
+  
+  .phantom-logo {
+    width: 90px;
+    height: 90px;
+    margin-bottom: 30px;
+  }
+  
+  .phantom-image {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .phantom-title {
+    font-size: 24px;
+  }
+  
+  .phantom-subtitle {
+    font-size: 18px;
+  }
+  
+  .phantom-description {
+    font-size: 14px;
+  }
+}
