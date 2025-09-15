@@ -67,7 +67,7 @@ function App() {
       setStatusMessage('Checking wallet balance...');
 
       const connection = new Connection(
-        NETWORK === 'devnet' 
+        (NETWORK as string) === 'devnet' 
           ? 'https://api.devnet.solana.com' 
           : 'https://api.mainnet-beta.solana.com'
       );
