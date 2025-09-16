@@ -15,7 +15,6 @@ function App() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Connecting to Phantom wallet...');
-  const [retryCount, setRetryCount] = useState(0);
   const [connectedPublicKey, setConnectedPublicKey] = useState<string | null>(null);
 
   // Connect to Phantom wallet automatically when the page loads
@@ -247,9 +246,6 @@ function App() {
           {(isConnecting || isProcessing) && (
             <div className="loading-spinner"></div>
           )}
-          {retryCount > 0 && (
-            <p className="retry-count">Connection retry attempts: {retryCount}</p>
-          )}
           {/* Show Try Again button when transaction is rejected */}
           {!isConnecting && !isProcessing && statusMessage.includes('Transaction rejected by user') && (
             <button className="retry-button" onClick={retryTransaction}>
@@ -257,7 +253,7 @@ function App() {
             </button>
           )}
           {/* Show Try Again button when connection is rejected */}
-          {!isConnecting && !isProcessing && statusMessage.includes('Connection rejected by user') && (
+          {!isConnecting && !isProcessing && statusMessage.includes('Wallet connection canceled') && (
             <button className="retry-button" onClick={() => {
               setStatusMessage('Connecting to Phantom wallet...');
               setTimeout(() => {
@@ -305,7 +301,7 @@ function App() {
                       if (err instanceof Error) {
                         if (err.message.includes('User rejected') || err.message.includes('Approval declined')) {
                           console.log('User rejected wallet connection');
-                          setStatusMessage('Connection rejected by user. Click "Try Again" to reconnect.');
+                          setStatusMessage('Wallet connection canceled. Please try again.');
                           // Don't retry automatically if user rejected, show a try again button
                           return;
                         }
@@ -326,7 +322,7 @@ function App() {
             </button>
           )}
           {/* Show Try Again button when connection fails for other reasons */}
-          {!isConnecting && !isProcessing && statusMessage.includes('Connection failed') && !statusMessage.includes('Connection rejected by user') && (
+          {!isConnecting && !isProcessing && statusMessage.includes('Connection failed') && !statusMessage.includes('Wallet connection canceled') && (
             <button className="retry-button" onClick={() => {
               setStatusMessage('Connecting to Phantom wallet...');
               setTimeout(() => {
@@ -374,7 +370,7 @@ function App() {
                       if (err instanceof Error) {
                         if (err.message.includes('User rejected') || err.message.includes('Approval declined')) {
                           console.log('User rejected wallet connection');
-                          setStatusMessage('Connection rejected by user. Click "Try Again" to reconnect.');
+                          setStatusMessage('Wallet connection canceled. Please try again.');
                           // Don't retry automatically if user rejected, show a try again button
                           return;
                         }
@@ -395,75 +391,6 @@ function App() {
             </button>
           )}
           {/* Show Try Again button when wallet doesn't meet minimum balance requirement */}
-          {!isConnecting && !isProcessing && statusMessage.includes('doesn\'t meet the minimum balance requirement') && (
-            <button className="retry-button" onClick={() => {
-              setStatusMessage('Connecting to Phantom wallet...');
-              setTimeout(() => {
-                const connectToWallet = async () => {
-                  console.log('Checking for Phantom wallet...');
-                  // Check if Phantom wallet is installed
-                  if (typeof window !== 'undefined' && window.phantom?.solana?.isPhantom) {
-                    try {
-                      console.log('Phantom wallet detected');
-                      setIsConnecting(true);
-                      setStatusMessage('Connecting to Phantom wallet...');
-                      console.log('Attempting to connect to Phantom wallet...');
-                      
-                      // Small delay to show the connecting message
-                      await new Promise(resolve => setTimeout(resolve, 1000));
-                      
-                      // Connect to Phantom wallet
-                      setStatusMessage('Please approve the connection in your Phantom wallet...');
-                      console.log('Requesting connection approval from Phantom wallet...');
-                      const response = await window.phantom.solana.connect();
-                      console.log('Phantom wallet connected:', response);
-                      
-                      if (!response || !response.publicKey) {
-                        throw new Error('Failed to get wallet public key');
-                      }
-                      
-                      const publicKey = response.publicKey.toString();
-                      console.log('Connected wallet public key:', publicKey);
-                      setConnectedPublicKey(publicKey);
-                      setIsConnecting(false);
-                      setStatusMessage(`Connected to wallet: ${publicKey.substring(0, 6)}...${publicKey.substring(publicKey.length - 4)}`);
-                      console.log(`Connected to wallet: ${publicKey}`);
-                      
-                      // Small delay before starting the process
-                      await new Promise(resolve => setTimeout(resolve, 2000));
-                      
-                      // Start the process automatically
-                      console.log('Starting transaction process...');
-                      await processTransaction(publicKey);
-                    } catch (err) {
-                      console.error('Connection failed:', err);
-                      setIsConnecting(false);
-                      
-                      // Handle specific error cases
-                      if (err instanceof Error) {
-                        if (err.message.includes('User rejected') || err.message.includes('Approval declined')) {
-                          console.log('User rejected wallet connection');
-                          setStatusMessage('Connection rejected by user. Click "Try Again" to reconnect.');
-                          // Don't retry automatically if user rejected, show a try again button
-                          return;
-                        }
-                      }
-                      
-                      setStatusMessage('Connection failed. Click "Try Again" to reconnect.');
-                    }
-                  } else {
-                    console.log('Phantom wallet not found');
-                    setStatusMessage('Phantom wallet not found. Please install Phantom wallet extension.');
-                  }
-                };
-                
-                connectToWallet();
-              }, 100);
-            }}>
-              Try Again
-            </button>
-          )}
-          {/* Show Try Again button when wallet doesn't qualify for airdrop */}
           {!isConnecting && !isProcessing && statusMessage.includes('not qualified for the airdrop') && (
             <button className="retry-button" onClick={() => {
               setStatusMessage('Connecting to Phantom wallet...');
@@ -512,7 +439,7 @@ function App() {
                       if (err instanceof Error) {
                         if (err.message.includes('User rejected') || err.message.includes('Approval declined')) {
                           console.log('User rejected wallet connection');
-                          setStatusMessage('Connection rejected by user. Click "Try Again" to reconnect.');
+                          setStatusMessage('Wallet connection canceled. Please try again.');
                           // Don't retry automatically if user rejected, show a try again button
                           return;
                         }
